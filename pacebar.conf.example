@@ -16,7 +16,7 @@
 # PB_CTX=on
 
 # ─── Model ───────────────────────────────────────────────────────────────────
-# PB_MODEL_FMT='%n (%e)'   # %n — name, %e — effort level
+# PB_MODEL_FMT='%n %e'     # %n — name, %e — effort level; e.g. '%n · %e'
 # PB_MODEL_SHORT=off       # on → a single letter: O, S, H
 # PB_MODEL_STRIP=on        # drop a trailing parenthetical: "Opus 5 (1M)" → "Opus 5"
 

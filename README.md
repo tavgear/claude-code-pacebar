@@ -6,7 +6,7 @@ that fits a phone. It works as shipped — no config file, nothing to fill in �
 and every label, width, colour and format can be changed when you want it.
 
 ```
-Opus 5 (xhigh) │ 5h:▓▓▓▓46%░░░░░ 3h12m │ 24h:▓▓▓▓66%▓░░░░ 3h15m │ 7d:▓▓▓▓38%░░░░░ 4d3h │ ctx:▓▓▓▓33%░░░░░
+Opus 5 xhigh │ 5h:▓▓▓▓46%░░░░░ 3h12m │ 24h:▓▓▓▓66%▓░░░░ 3h15m │ 7d:▓▓▓▓38%░░░░░ 4d3h │ ctx:▓▓▓▓33%░░░░░
 ```
 
 Filled cells (`▓`) carry the colour: green below 50%, amber to 80%, red above.
@@ -105,7 +105,7 @@ default shown here.
 
 | Name | Default | Meaning |
 |---|---|---|
-| `PB_MODEL_FMT` | `%n (%e)` | `%n` name, `%e` effort level |
+| `PB_MODEL_FMT` | `%n %e` | `%n` name, `%e` effort level; e.g. `'%n · %e'` |
 | `PB_MODEL_SHORT` | `off` | `on` → a single letter: `O`, `S`, `H` |
 | `PB_MODEL_STRIP` | `on` | drop a trailing parenthetical: `Opus 5 (1M)` → `Opus 5` |
 

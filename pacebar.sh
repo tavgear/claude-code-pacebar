@@ -41,7 +41,7 @@ PB_7D=on
 PB_CTX=on
 
 # Model
-PB_MODEL_FMT='%n (%e)'   # %n — model name, %e — effort level
+PB_MODEL_FMT='%n %e'     # %n — model name, %e — effort level
 PB_MODEL_SHORT=off       # on → a single letter: O, S, H
 PB_MODEL_STRIP=on        # drop a trailing parenthetical: "Opus 5 (1M)" → "Opus 5"
 
@@ -246,7 +246,7 @@ section_model() {
   if [ -n "$EFFORT" ]; then
     out=${out//%e/$EFFORT}
   else
-    out=$(sed -E 's/ *\(%e\)//g; s/%e//g' <<<"$out")   # no effort → drop its slot
+    out=$(sed -E 's/ *\(%e\)//g; s/ *%e//g; s/ +$//' <<<"$out")   # no effort → drop its slot
   fi
   printf '%s' "$out"
 }
