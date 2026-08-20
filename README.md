@@ -1,27 +1,58 @@
 # pacebar
 
-A status line for [Claude Code](https://claude.com/claude-code) that shows how
-fast you are burning your rate limits — and whether today is ahead of or behind
-an even weekly pace.
+A status line for [Claude Code](https://claude.com/claude-code): how fast you are
+burning your rate limits, whether today is ahead of or behind an even weekly
+pace, and all of it still legible on a phone.
 
 ![pacebar](demo/pacebar.png)
 
-## The 24h gauge
+## Today, not just the week
 
-Claude Code reports two windows: 5-hour and 7-day. The weekly number on its own
-says little — 50% on Monday is trouble, 50% on Friday is money in the bank.
+Claude Code reports two windows, 5-hour and 7-day. The weekly number on its own
+says little: 50% on Monday is trouble, 50% on Friday is money in the bank.
 
-pacebar splits the week into seven equal days worth 100/7 % each, counted from
-the start of the weekly window rather than from local midnight, and shows how
-much of *today's* share is gone:
+So pacebar adds a gauge for **today**. The week is split into seven equal days
+worth 100/7 % each, counted from the start of the weekly window rather than from
+local midnight, and the gauge shows how much of today's share is gone:
 
 ```
 today% = 7 × week% − 100 × whole_days_elapsed
 ```
 
-Past 100% you are borrowing from tomorrow. Below zero yesterday left a surplus,
-drawn as an empty gauge captioned `+60%`. Nothing is stored on disk — it all
-comes out of the numbers Claude Code already sends.
+Read it as a speedometer rather than a fuel gauge:
+
+| | |
+|---|---|
+| `40%` | less than half of today's allowance spent |
+| `100%` | exactly on pace |
+| `164%` | today ran well past its share — you are borrowing from tomorrow |
+| `+58%` | an empty gauge: yesterday underspent, today starts with a surplus |
+
+The second row of the picture above is the case worth having it for: the weekly
+gauge sits green at 38% while today is already amber at 66%. The week says
+you are fine, today says slow down, and only one of them is actionable.
+
+None of this is stored anywhere — no history file, no daemon, no midnight
+rollover to get wrong. It falls out of the two numbers Claude Code already sends.
+
+## Narrow terminals
+
+Claude Code also runs on a phone, where a row of 12-cell gauges with labels
+simply does not fit. Every single setting has a `PB_M_*` twin that replaces it
+below `PB_WIDE_MIN` columns — that is the entire mechanism. No second code path,
+no separate mobile config format, nothing to keep in sync.
+
+The shipped narrow defaults drop the 24h gauge, drop the labels, shorten the
+gauges to 9 cells, hide the `%` signs and cut the model down to a single letter.
+The `narrow` rows in the picture above are exactly that.
+
+Disagree with any of it? It is one line. Keep today's gauge on the phone and
+drop the context one instead:
+
+```bash
+PB_M_24H=on
+PB_M_CTX=off
+```
 
 ## Install
 
@@ -108,14 +139,6 @@ over the preset.
 | `%s` `%S` | seconds in minute, plain / zero-padded | `%%` | a literal `%` |
 
 So `PB_TIME_M='%m:%S'` gives `56:07`, and `PB_TIME_D='%dd %hh %mm'` gives `3d 4h 56m`.
-
-## Mobile preset
-
-Any `PB_M_<NAME>` replaces `PB_<NAME>` once the terminal is narrower than
-`PB_WIDE_MIN`. That is the entire mechanism — add your own the same way.
-
-Shipped defaults drop the 24h gauge and the labels, shorten the gauges to 9
-cells, hide the `%` signs and cut the model down to one letter.
 
 ## License
 
