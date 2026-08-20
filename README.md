@@ -60,7 +60,7 @@ PB_M_CTX=off
 
 ## Install
 
-Needs `bash`, `jq` and a 256-colour terminal.
+Needs `bash` 3.2 or newer and a 256-colour terminal.
 
 ```bash
 git clone https://github.com/tavgear/claude-code-pacebar ~/.claude/pacebar
@@ -74,14 +74,7 @@ Then in `~/.claude/settings.json`:
 }
 ```
 
-That is the whole install. To see it without waiting to burn a limit:
-
-```bash
-./preview.sh              # a gallery of typical states
-./preview.sh 42 55 30     # your own 5h / week / context numbers
-./preview.sh --configs    # the same numbers under different settings
-./pacebar.sh --version
-```
+That is the whole install.
 
 ## Configuration
 
@@ -150,6 +143,18 @@ over the preset.
 | `%s` `%S` | seconds in minute, plain / zero-padded | `%%` | a literal `%` |
 
 So `PB_TIME_M='%m:%S'` gives `56:07`, and `PB_TIME_D='%dd %hh %mm'` gives `3d 4h 56m`.
+
+## Preview
+
+The gauges are easier to tune against numbers you do not have yet:
+
+```bash
+./preview.sh              # a gallery of typical states
+./preview.sh 42 55 30     # your own 5h / week / context numbers
+./preview.sh --configs    # the same numbers under different settings
+```
+
+`./pacebar.sh --version` prints the version.
 
 ## Input
 
