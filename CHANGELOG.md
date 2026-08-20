@@ -14,8 +14,9 @@ First public release.
   which can read above 100% (borrowing from tomorrow) or below zero (yesterday
   left a surplus).
 - Configuration through `~/.claude/pacebar.conf`: sections on/off and in any
-  order, per-gauge label, width, percentage style and colour thresholds, the
-  palette, and templated time formats with `compact`, `clock` and `long` presets.
+  order, the divider between them, per-gauge label, width, percentage style and
+  colour thresholds, the palette, and templated time formats with `compact`,
+  `clock` and `long` presets.
 - Mobile preset: any `PB_M_*` name replaces its `PB_*` twin below
   `PB_WIDE_MIN` columns.
 - `preview.sh` for rendering made-up states, and `demo/render.py` to turn that

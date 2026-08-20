@@ -31,7 +31,8 @@ esac
 # Layout
 PB_WIDE_MIN=125                    # columns; below this the mobile preset applies
 PB_ORDER="model 5h 24h 7d ctx"     # sections to print, in order
-PB_SEP=2                           # spaces between sections
+PB_SEP=1                           # spaces on each side of the divider
+PB_SEP_CHAR='│'                    # divider between sections; empty for spaces only
 
 # Sections on/off
 PB_MODEL=on
@@ -275,7 +276,8 @@ for name in $PB_ORDER; do
 done
 
 [ ${#parts[@]} -eq 0 ] && exit 0
-printf -v sep '%*s' "$PB_SEP" ''
+printf -v pad '%*s' "$PB_SEP" ''
+sep="$pad${PB_SEP_CHAR:+$C_DIM$PB_SEP_CHAR$CR}$pad"
 line=${parts[0]}
 for (( i = 1; i < ${#parts[@]}; i++ )); do line+="$sep${parts[$i]}"; done
 printf '%s\n' "$line"

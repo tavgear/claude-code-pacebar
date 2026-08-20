@@ -4,7 +4,10 @@
 # ─── Layout ──────────────────────────────────────────────────────────────────
 # PB_WIDE_MIN=125                  # columns; below this the mobile preset applies
 # PB_ORDER="model 5h 24h 7d ctx"   # sections to print, in order
-# PB_SEP=2                         # spaces between sections
+# PB_SEP=1                         # spaces on each side of the divider
+# PB_SEP_CHAR='│'                  # divider between sections; empty for spaces only.
+#                                  # Heavier box-drawing glyphs (┃ ║) are missing from
+#                                  # many terminal fonts — '|' is the safe fallback.
 
 # ─── Sections on/off ─────────────────────────────────────────────────────────
 # PB_MODEL=on
