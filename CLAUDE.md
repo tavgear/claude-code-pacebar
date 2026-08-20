@@ -29,8 +29,12 @@ A new or changed setting lands in three places at once: the Defaults block,
 - Bar cells carry block glyphs, so the bars read without colour; colour only
   reinforces them.
 - A missing or unreadable field skips its section rather than failing.
-- The version lives in `PB_VERSION` and `CHANGELOG.md` (Keep a Changelog,
-  SemVer).
+- The version lives in `PB_VERSION`, `CHANGELOG.md` (Keep a Changelog, SemVer)
+  and the two `.claude-plugin/*.json` manifests; a release bumps all of them.
+- Two installs, one script: the clone plus a settings line, and the plugin,
+  whose `/pacebar:setup` command writes that same line. A plugin cannot own a
+  status line, so `setup` copies the script out of the versioned plugin
+  directory.
 
 ## Checking a change
 

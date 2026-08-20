@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- A marketplace manifest and a one-command plugin: `/plugin marketplace add
+  tavgear/claude-code-pacebar`, `/plugin install pacebar@pacebar` and
+  `/pacebar:setup`, which copies the script to `~/.claude/pacebar/pacebar.sh`
+  and writes the `statusLine` entry. The clone-and-one-line install is
+  unchanged.
+
 ## [1.1.0] — 2026-08-20
 
 ### Changed

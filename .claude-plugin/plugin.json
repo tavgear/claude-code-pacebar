@@ -1,0 +1,21 @@
+{
+  "name": "pacebar",
+  "description": "A status line for Claude Code: rate-limit gauges, a gauge for today's pace through the weekly window, and a narrow layout that fits a phone. Pure bash, no dependencies.",
+  "version": "1.1.0",
+  "author": {
+    "name": "tvg",
+    "url": "https://github.com/tavgear"
+  },
+  "homepage": "https://github.com/tavgear/claude-code-pacebar",
+  "repository": "https://github.com/tavgear/claude-code-pacebar",
+  "license": "MIT",
+  "keywords": [
+    "statusline",
+    "status-line",
+    "rate-limits",
+    "usage",
+    "context-window",
+    "bash",
+    "no-dependencies"
+  ]
+}
