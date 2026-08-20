@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-08-20
+
+### Changed
+- The status-line JSON is parsed in bash instead of jq, and the model section
+  is formatted without sed. pacebar now needs nothing but bash 3.2 or newer.
+
 ## [1.0.0] — 2026-08-20
 
 First public release.
@@ -22,4 +28,5 @@ First public release.
 - `preview.sh` for rendering made-up states, and `demo/render.py` to turn that
   into the image in the README.
 
-[1.0.0]: https://github.com/tvg/claude-code-pacebar/releases/tag/v1.0.0
+[1.0.0]: https://github.com/tavgear/claude-code-pacebar/releases/tag/v1.0.0
+[1.1.0]: https://github.com/tavgear/claude-code-pacebar/compare/v1.0.0...v1.1.0

@@ -10,17 +10,16 @@
 set -u
 cd "$(dirname "$0")"
 
-NOW=$(date +%s)
+NOW=${EPOCHSECONDS:-$(date +%s)}
 
 # $1 5h %, $2 week %, $3 context %, $4 hours until the 5h reset, $5 days until the weekly reset
 feed() {
-  jq -n --argjson h "$1" --argjson w "$2" --argjson c "$3" \
-        --argjson r5 "$((NOW + $4 * 3600 + 743))" --argjson r7 "$((NOW + $5 * 86400 + 11700))" \
-    '{ model: { display_name: "Opus 5 (1M)" },
-       effort: { level: "xhigh" },
-       rate_limits: { five_hour: { used_percentage: $h, resets_at: $r5 },
-                      seven_day: { used_percentage: $w, resets_at: $r7 } },
-       context_window: { used_percentage: $c } }'
+  printf '{ "model": { "display_name": "Opus 5 (1M)" },
+             "effort": { "level": "xhigh" },
+             "rate_limits": { "five_hour": { "used_percentage": %s, "resets_at": %s },
+                              "seven_day": { "used_percentage": %s, "resets_at": %s } },
+             "context_window": { "used_percentage": %s } }\n' \
+    "$1" "$(( NOW + $4 * 3600 + 743 ))" "$2" "$(( NOW + $5 * 86400 + 11700 ))" "$3"
 }
 
 show() {  # $1 caption, then feed's arguments

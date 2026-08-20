@@ -10,15 +10,15 @@
 # Every label, width, colour and format below is configurable; see the
 # "Defaults" block and pacebar.conf.example.
 #
-# https://github.com/tvg/claude-code-pacebar
+# https://github.com/tavgear/claude-code-pacebar
 
 set -u
 
-PB_VERSION=1.0.0
+PB_VERSION=1.1.0
 
 case ${1-} in
   -v|--version) printf 'pacebar %s\n' "$PB_VERSION"; exit 0 ;;
-  -h|--help)    printf 'pacebar %s — a status line for Claude Code.\nUsage: pacebar.sh < status.json\nConfig: %s\nDocs:   https://github.com/tvg/claude-code-pacebar\n' \
+  -h|--help)    printf 'pacebar %s — a status line for Claude Code.\nUsage: pacebar.sh < status.json\nConfig: %s\nDocs:   https://github.com/tavgear/claude-code-pacebar\n' \
                   "$PB_VERSION" "${PB_CONF:-~/.claude/pacebar.conf}"; exit 0 ;;
 esac
 
@@ -111,17 +111,64 @@ printf -v C_EMPTY '\033[%s;48;5;%sm'  "$PB_COLOR_TEXT_EMPTY" "$PB_COLOR_EMPTY"
 # ─── Input ───────────────────────────────────────────────────────────────────
 
 input=$(cat)
-
-if ! command -v jq >/dev/null 2>&1; then
-  printf 'pacebar: jq not found\n'
-  exit 0
-fi
+now=${EPOCHSECONDS:-$(date +%s)}
 
 MODEL='' EFFORT='' H5='' H5_LEFT='' W7='' W7_LEFT='' D24='' D24_LEFT='' CTX=''
 
-# One jq pass for everything, including the synthetic 24h figure — a status
-# line is redrawn often enough that seven separate jq calls were noticeable.
-#
+# The JSON is read here in plain bash, so that a status line needs nothing but
+# the shell. That is only reasonable because the input is not arbitrary: Claude
+# Code writes it, and every field below is a plain number or string sitting in a
+# named object. Anything that does not match leaves its variable empty, and the
+# section drops out of the line — the same way a missing field behaves.
+
+# $1 object name → $2 gets its body; one level of nesting inside it is allowed.
+json_obj() {
+  local re="\"$1\"[[:space:]]*:[[:space:]]*\{(([^{}]|\{[^{}]*\})*)\}"
+  [[ $input =~ $re ]] && printf -v "$2" '%s' "${BASH_REMATCH[1]}" || printf -v "$2" '%s' ''
+}
+
+# $2 key in body $1 → $3 gets its number, integer part only.
+json_int() {
+  local re="\"$2\"[[:space:]]*:[[:space:]]*(-?[0-9]+)"
+  [[ $1 =~ $re ]] && printf -v "$3" '%s' "${BASH_REMATCH[1]}" || printf -v "$3" '%s' ''
+}
+
+# $2 key in body $1 → $3 gets its number in hundredths: 46.87 → 4687. Bash has
+# no fractions, and the 24h figure multiplies the weekly percentage by seven,
+# so the two decimals are worth keeping until the last step.
+json_centi() {
+  local re="\"$2\"[[:space:]]*:[[:space:]]*([0-9]+)(\.([0-9]+))?" frac
+  if [[ $1 =~ $re ]]; then
+    frac="${BASH_REMATCH[3]}00"
+    printf -v "$3" '%s' "$(( ${BASH_REMATCH[1]} * 100 + 10#${frac:0:2} ))"
+  else
+    printf -v "$3" '%s' ''
+  fi
+}
+
+# $2 key in body $1 → $3 gets its string. A backslash escape does not end the
+# string; the two escapes that can plausibly reach a model name are unwrapped,
+# while \uXXXX is left as written rather than decoded.
+json_str() {
+  local re="\"$2\"[[:space:]]*:[[:space:]]*\"((\\\\.|[^\"\\\\])*)\"" v
+  if [[ $1 =~ $re ]]; then
+    v=${BASH_REMATCH[1]}
+    v=${v//\\\"/\"}
+    printf -v "$3" '%s' "${v//\\\\/\\}"
+  else
+    printf -v "$3" '%s' ''
+  fi
+}
+
+json_obj model          _o ; json_str "$_o" display_name    MODEL
+json_obj effort         _o ; json_str "$_o" level           EFFORT
+json_obj context_window _o ; json_int "$_o" used_percentage CTX
+
+json_obj five_hour _o
+json_int "$_o" used_percentage H5
+json_int "$_o" resets_at       _at
+[ -n "$_at" ] && H5_LEFT=$(( _at > now ? _at - now : 0 ))
+
 # The 24h gauge assumes the weekly allowance is meant to be spent evenly: the
 # week is seven equal days worth 100/7 % each, counted from the start of the
 # weekly window (resets_at − 7d) rather than from local midnight. Subtract the
@@ -129,30 +176,20 @@ MODEL='' EFFORT='' H5='' H5_LEFT='' W7='' W7_LEFT='' D24='' D24_LEFT='' CTX=''
 # scales to a percentage of today's share as 7·week − 100·days. Above 100 means
 # borrowing from tomorrow; below zero means yesterday left a surplus. No state
 # on disk, nothing but the numbers Claude Code already sends.
-eval "$(printf '%s' "$input" | jq -r --argjson now "$(date +%s)" '
-  def clamp0: if . < 0 then 0 else . end;
-  def whole:  if type == "number" then floor else "" end;
-
-    (.rate_limits.five_hour  // {}) as $f
-  | (.rate_limits.seven_day  // {}) as $w
-  | (if $w.resets_at then (($w.resets_at - $now) | clamp0) else null end) as $wleft
-  | (if $wleft == null then null
-     else ((604800 - $wleft) | clamp0 | (. / 86400 | floor) | if . > 6 then 6 else . end)
-     end) as $days_gone
-  | {
-      MODEL:    (.model.display_name // ""),
-      EFFORT:   (.effort.level // ""),
-      H5:       ($f.used_percentage | whole),
-      H5_LEFT:  (if $f.resets_at then (($f.resets_at - $now) | clamp0) else "" end),
-      W7:       ($w.used_percentage | whole),
-      W7_LEFT:  ($wleft // ""),
-      D24:      (if ($w.used_percentage != null and $days_gone != null)
-                 then ((7 * $w.used_percentage - 100 * $days_gone) | round) else "" end),
-      D24_LEFT: (if $wleft == null then "" else ($wleft % 86400) end),
-      CTX:      (.context_window.used_percentage | whole)
-    }
-  | to_entries | map("\(.key)=\(.value | tostring | @sh)") | .[]
-' 2>/dev/null)"
+json_obj seven_day _o
+json_int   "$_o" used_percentage W7
+json_centi "$_o" used_percentage _w100
+json_int   "$_o" resets_at       _at
+if [ -n "$_at" ]; then
+  W7_LEFT=$(( _at > now ? _at - now : 0 ))
+  D24_LEFT=$(( W7_LEFT % 86400 ))
+  _gone=$(( W7_LEFT < 604800 ? (604800 - W7_LEFT) / 86400 : 0 ))
+  [ "$_gone" -gt 6 ] && _gone=6
+  if [ -n "$_w100" ]; then
+    _t=$(( 7 * _w100 - 10000 * _gone ))
+    D24=$(( _t >= 0 ? (_t + 50) / 100 : -((-_t + 50) / 100) ))
+  fi
+fi
 
 # ─── Rendering ───────────────────────────────────────────────────────────────
 
@@ -241,12 +278,23 @@ section_gauge() {
 section_model() {
   local name=$MODEL out=$PB_MODEL_FMT
   [ "$PB_MODEL_STRIP" = on ] && name=${name%% (*}
-  [ "$PB_MODEL_SHORT" = on ] && name=$(sed -E 's/.*Opus.*/O/I; s/.*Sonnet.*/S/I; s/.*Haiku.*/H/I' <<<"$name")
+  if [ "$PB_MODEL_SHORT" = on ]; then
+    shopt -s nocasematch
+    case $name in
+      *opus*)   name=O ;;
+      *sonnet*) name=S ;;
+      *haiku*)  name=H ;;
+    esac
+    shopt -u nocasematch
+  fi
   out=${out//%n/$name}
   if [ -n "$EFFORT" ]; then
     out=${out//%e/$EFFORT}
   else
-    out=$(sed -E 's/ *\(%e\)//g; s/ *%e//g; s/ +$//' <<<"$out")   # no effort → drop its slot
+    out=${out//(%e)/}                                        # no effort → drop
+    out=${out//%e/}                                          # its slot, then
+    while [[ $out == *"  "* ]]; do out=${out//  / }; done     # the gap it left
+    while [[ $out == *" " ]];  do out=${out% }; done
   fi
   printf '%s' "$out"
 }
