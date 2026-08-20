@@ -74,7 +74,14 @@ Then in `~/.claude/settings.json`:
 }
 ```
 
-That is the whole install.
+That is the whole install. To update later:
+
+```bash
+git -C ~/.claude/pacebar pull
+```
+
+The next redraw picks it up, and `~/.claude/pacebar.conf` is outside the clone,
+so it is left alone.
 
 ## Configuration
 
