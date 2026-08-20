@@ -56,8 +56,7 @@ a handful of different settings — `./preview.sh --configs`:
 |---|---|---|
 | `PB_WIDE_MIN` | `125` | columns; below this the mobile preset applies |
 | `PB_ORDER` | `model 5h 24h 7d ctx` | sections to print, in order |
-| `PB_SEP` | `1` | spaces on each side of the divider |
-| `PB_SEP_CHAR` | `│` | divider between sections; empty for spaces only |
+| `PB_SEP` | `' │ '` | printed between sections; `'  '` for plain spaces |
 | `PB_MODEL` `PB_5H` `PB_24H` `PB_7D` `PB_CTX` | `on` | each section on or off |
 
 **Model**

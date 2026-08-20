@@ -31,8 +31,7 @@ esac
 # Layout
 PB_WIDE_MIN=125                    # columns; below this the mobile preset applies
 PB_ORDER="model 5h 24h 7d ctx"     # sections to print, in order
-PB_SEP=1                           # spaces on each side of the divider
-PB_SEP_CHAR='│'                    # divider between sections; empty for spaces only
+PB_SEP=' │ '                       # printed between sections; '  ' for plain spaces
 
 # Sections on/off
 PB_MODEL=on
@@ -73,7 +72,6 @@ PB_TIME_M=''             # < 1 hour
 
 # Mobile preset. Any PB_M_<NAME> replaces PB_<NAME> on a narrow terminal; add
 # your own the same way.
-PB_M_SEP=1
 PB_M_MODEL_FMT='%n:'
 PB_M_MODEL_SHORT=on
 PB_M_24H=off
@@ -276,8 +274,7 @@ for name in $PB_ORDER; do
 done
 
 [ ${#parts[@]} -eq 0 ] && exit 0
-printf -v pad '%*s' "$PB_SEP" ''
-sep="$pad${PB_SEP_CHAR:+$C_DIM$PB_SEP_CHAR$CR}$pad"
+sep="${PB_SEP:+$C_DIM$PB_SEP$CR}"
 line=${parts[0]}
 for (( i = 1; i < ${#parts[@]}; i++ )); do line+="$sep${parts[$i]}"; done
 printf '%s\n' "$line"
