@@ -2,8 +2,9 @@
 
 A status line for [Claude Code](https://claude.com/claude-code): rate-limit
 gauges, a gauge for today's pace through the weekly window, and a narrow layout
-that fits a phone. It works as shipped — no config file, nothing to fill in —
-and every label, width, colour and format can be changed when you want it.
+that fits a phone. One bash script and nothing else — no jq, no node, no daemon,
+no history file. It works as shipped — no config file, nothing to fill in — and
+every label, width, colour and format can be changed when you want it.
 
 ```
 Opus 5 low │ 5h:▓▓▓▓46%░░░░░ 3h12m │ 24h:▓▓▓▓66%▓░░░░ 3h15m │ 7d:▓▓▓▓38%░░░░░ 4d3h │ ctx:▓▓▓▓33%░░░░░
@@ -83,6 +84,22 @@ git -C ~/.claude/pacebar pull
 
 The next redraw picks it up, and `~/.claude/pacebar.conf` is outside the clone,
 so it is left alone.
+
+### As a plugin
+
+The same thing through Claude Code's plugin system, which writes the settings
+line for you:
+
+```
+/plugin marketplace add tavgear/claude-code-pacebar
+/plugin install pacebar@pacebar
+/pacebar:setup
+```
+
+`/pacebar:setup` copies the script to `~/.claude/pacebar/pacebar.sh` and points
+`statusLine` at it. A plugin cannot own a status line itself, so the copy is
+what makes the path survive an update; `/plugin update pacebar` and
+`/pacebar:setup` again installs a newer version.
 
 ## Configuration
 
