@@ -2,6 +2,9 @@
 """Turn ANSI-coloured terminal output on stdin into a PNG, for the README.
 
     ./preview.sh | python3 demo/render.py demo/pacebar.png
+
+Only needed to regenerate the images in the README. The font paths below are
+Debian's; point them at any monospace TTF your system has.
 """
 import re, sys
 from PIL import Image, ImageDraw, ImageFont
