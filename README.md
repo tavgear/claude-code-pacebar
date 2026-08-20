@@ -2,7 +2,15 @@
 
 A status line for [Claude Code](https://claude.com/claude-code): rate-limit
 gauges, a gauge for today's pace through the weekly window, and a narrow layout
-that fits a phone.
+that fits a phone. It works as shipped — no config file, nothing to fill in —
+and every label, width, colour and format can be changed when you want it.
+
+```
+Opus 5 (xhigh) │ 5h:▓▓▓▓46%░░░░░ 3h12m │ 24h:▓▓▓▓66%▓░░░░ 3h15m │ 7d:▓▓▓▓38%░░░░░ 4d3h │ ctx:▓▓▓▓33%░░░░░
+```
+
+Filled cells (`▓`) carry the colour: green below 50%, amber to 80%, red above.
+Markdown cannot show that, so:
 
 ![pacebar](demo/pacebar.png)
 
@@ -18,15 +26,15 @@ each, counted from the start of the weekly window rather than local midnight:
 today% = 7 × week% − 100 × whole_days_elapsed
 ```
 
-| | |
+| Reads | Means |
 |---|---|
 | `40%` | under half of today's share spent |
 | `100%` | on pace |
 | `164%` | past today's share — borrowing from tomorrow |
 | `+58%` | empty gauge: yesterday underspent, today starts with a surplus |
 
-Second row of the picture: week green at 38%, today amber at 66%. Only the
-second number is worth acting on.
+In the line at the top, `7d` sits at 38% and `24h` at 66%: the week says you are
+fine, today says slow down. Only the second is worth acting on.
 
 No history file, no daemon, no midnight rollover — it falls out of the two
 numbers Claude Code already sends.
@@ -34,11 +42,16 @@ numbers Claude Code already sends.
 ## Narrow terminals
 
 Claude Code also runs on a phone, where 12-cell gauges with labels do not fit.
-Every setting has a `PB_M_*` twin that replaces it below `PB_WIDE_MIN` columns.
-That is the whole mechanism — no second code path.
+The same moment, at 80 columns:
 
-Narrow defaults: no 24h gauge, no labels, 9-cell gauges, no `%` signs, model cut
-to one letter — the `narrow` rows above. Change any of it in one line:
+```
+O: │ ▓▓▓46░░░░ 3h12m │ ▓▓▓38░░░░ 4d3h │ ▓▓▓33░░░░
+```
+
+Every setting has a `PB_M_*` twin that replaces it below `PB_WIDE_MIN` columns.
+That is the whole mechanism — no second code path. The narrow defaults drop the
+24h gauge and the labels, shorten gauges to 9 cells, hide the `%` signs and cut
+the model to one letter. Change any of it in one line:
 
 ```bash
 PB_M_24H=on
@@ -50,7 +63,7 @@ PB_M_CTX=off
 Needs `bash`, `jq` and a 256-colour terminal.
 
 ```bash
-git clone https://github.com/tvg/claude-code-pacebar ~/.claude/pacebar
+git clone https://github.com/tavgear/claude-code-pacebar ~/.claude/pacebar
 ```
 
 Then in `~/.claude/settings.json`:
@@ -61,29 +74,36 @@ Then in `~/.claude/settings.json`:
 }
 ```
 
-To see it without waiting to burn a limit: `./preview.sh`, or `./preview.sh 42 55 30`
-for your own 5h / week / context numbers.
+That is the whole install. To see it without waiting to burn a limit:
+
+```bash
+./preview.sh              # a gallery of typical states
+./preview.sh 42 55 30     # your own 5h / week / context numbers
+./preview.sh --configs    # the same numbers under different settings
+./pacebar.sh --version
+```
 
 ## Configuration
 
-Copy [`pacebar.conf.example`](pacebar.conf.example) to `~/.claude/pacebar.conf`
-and uncomment what you want. It is sourced as plain bash. The same numbers under
-a handful of different settings — `./preview.sh --configs`:
+Optional. Copy [`pacebar.conf.example`](pacebar.conf.example) to
+`~/.claude/pacebar.conf` and uncomment what you want; it is sourced as plain
+bash. `PB_CONF=/path/to/file` points elsewhere. Anything left out keeps the
+default shown here.
 
 ![configuration examples](demo/configs.png)
 
 **Layout**
 
-| Name | Default | |
+| Name | Default | Meaning |
 |---|---|---|
-| `PB_WIDE_MIN` | `125` | columns; below this the mobile preset applies |
+| `PB_WIDE_MIN` | `125` | columns; below this the `PB_M_*` values apply |
 | `PB_ORDER` | `model 5h 24h 7d ctx` | sections to print, in order |
 | `PB_SEP` | `' │ '` | printed between sections; `'  '` for plain spaces |
-| `PB_MODEL` `PB_5H` `PB_24H` `PB_7D` `PB_CTX` | `on` | each section on or off |
+| `PB_MODEL` `PB_5H` `PB_24H` `PB_7D` `PB_CTX` | `on` | `on`/`off` per section |
 
 **Model**
 
-| Name | Default | |
+| Name | Default | Meaning |
 |---|---|---|
 | `PB_MODEL_FMT` | `%n (%e)` | `%n` name, `%e` effort level |
 | `PB_MODEL_SHORT` | `off` | `on` → a single letter: `O`, `S`, `H` |
@@ -91,23 +111,23 @@ a handful of different settings — `./preview.sh --configs`:
 
 **Gauges** — `X` is `5H`, `24H`, `7D` or `CTX`
 
-| Name | Default | |
+| Name | Default | Meaning |
 |---|---|---|
 | `PB_X_LABEL` | `5h:` `24h:` `7d:` `ctx:` | printed verbatim; empty for none |
 | `PB_X_WIDTH` | `12` | cells |
 | `PB_X_PCT` | `pct` | `pct` → `46%`, `num` → `46`, `off` → nothing |
-| `PB_X_LEFT` | `on` (`off` for `CTX`) | time until the window resets |
+| `PB_X_LEFT` | `on`, `off` for `CTX` | `on`/`off`: time until the window resets |
 | `PB_X_WARN` | `50` | amber from here |
 | `PB_X_CRIT` | `80` | red from here |
 
 **Colours** — 256-colour palette indices
 
-| Name | Default | |
+| Name | Default | Meaning |
 |---|---|---|
 | `PB_COLOR_OK` / `_WARN` / `_CRIT` | `22` / `94` / `88` | fill, by severity |
 | `PB_COLOR_EMPTY` | `236` | unfilled cells |
 | `PB_COLOR_TEXT` / `_TEXT_EMPTY` | `97` / `37` | caption over filled / unfilled cells |
-| `PB_COLOR_DIM` | `90` | labels |
+| `PB_COLOR_DIM` | `90` | labels and the separator |
 
 ## Time formats
 
@@ -130,6 +150,20 @@ over the preset.
 | `%s` `%S` | seconds in minute, plain / zero-padded | `%%` | a literal `%` |
 
 So `PB_TIME_M='%m:%S'` gives `56:07`, and `PB_TIME_D='%dd %hh %mm'` gives `3d 4h 56m`.
+
+## Input
+
+`pacebar.sh` reads Claude Code's status-line JSON on stdin and prints one line.
+A section whose field is absent is skipped.
+
+| Field | Feeds |
+|---|---|
+| `.model.display_name` | model name |
+| `.effort.level` | effort level |
+| `.rate_limits.five_hour.used_percentage`, `.resets_at` | 5h gauge |
+| `.rate_limits.seven_day.used_percentage`, `.resets_at` | 7d gauge, and all of the 24h gauge |
+| `.context_window.used_percentage` | ctx gauge |
+| `$COLUMNS` | wide or narrow layout |
 
 ## License
 
