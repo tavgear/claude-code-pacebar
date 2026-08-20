@@ -6,7 +6,7 @@ that fits a phone. It works as shipped — no config file, nothing to fill in �
 and every label, width, colour and format can be changed when you want it.
 
 ```
-Opus 5 xhigh │ 5h:▓▓▓▓46%░░░░░ 3h12m │ 24h:▓▓▓▓66%▓░░░░ 3h15m │ 7d:▓▓▓▓38%░░░░░ 4d3h │ ctx:▓▓▓▓33%░░░░░
+Opus 5 low │ 5h:▓▓▓▓46%░░░░░ 3h12m │ 24h:▓▓▓▓66%▓░░░░ 3h15m │ 7d:▓▓▓▓38%░░░░░ 4d3h │ ctx:▓▓▓▓33%░░░░░
 ```
 
 Filled cells (`▓`) carry the colour: green below 50%, amber to 80%, red above.
