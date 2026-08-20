@@ -8,7 +8,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 FONT = "/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf"
 BOLD = "/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf"
-SIZE, PAD, BG = 26, 28, (22, 24, 29)
+SIZE, PAD, GAP, BG = 26, 28, 4, (22, 24, 29)  # GAP keeps identical bars in
+                                              # neighbouring rows from merging
 
 # xterm system colours 0-15, then the 6×6×6 cube and the grey ramp.
 SYS = [(0,0,0),(205,0,0),(0,205,0),(205,205,0),(0,0,238),(205,0,205),(0,205,205),(229,229,229),
@@ -56,7 +57,7 @@ while lines and not lines[-1]:
 
 font, bold_font = ImageFont.truetype(FONT, SIZE), ImageFont.truetype(BOLD, SIZE)
 cw = font.getlength("M")
-ch = SIZE * 1.55
+ch = SIZE * 1.7
 img = Image.new("RGB", (int(max(len(l) for l in lines) * cw) + PAD * 2,
                         int(len(lines) * ch) + PAD * 2), BG)
 draw = ImageDraw.Draw(img)
@@ -66,9 +67,9 @@ for row, line in enumerate(lines):
     for col, (char, fg, bg, bold) in enumerate(line):
         x = PAD + col * cw
         if bg:
-            draw.rectangle([x, y, x + cw + 1, y + ch], fill=bg)
+            draw.rectangle([x, y + GAP, x + cw + 1, y + ch - GAP], fill=bg)
         if char != " ":
-            draw.text((x, y + ch * 0.18), char, font=bold_font if bold else font, fill=fg)
+            draw.text((x, y + ch * 0.22), char, font=bold_font if bold else font, fill=fg)
 
 img.save(sys.argv[1])
 print(f"{sys.argv[1]}: {img.width}×{img.height}")

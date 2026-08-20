@@ -5,6 +5,7 @@
 #
 #   ./preview.sh              a gallery of typical states
 #   ./preview.sh 42 55 30     your own: 5h %, week %, context %
+#   ./preview.sh --configs    the same numbers under different settings
 
 set -u
 cd "$(dirname "$0")"
@@ -29,12 +30,38 @@ show() {  # $1 caption, then feed's arguments
   printf '  narrow  '; feed "$@" | COLUMNS=80  ./pacebar.sh
 }
 
-if [ $# -ge 3 ]; then
+# One line per setting, to show what the knobs actually do.
+configs() {
+  local pairs=(
+    "default"           ""
+    "clock times"       "PB_TIME_PRESET=clock"
+    "long times"        "PB_TIME_PRESET=long"
+    "seconds, my way"   "PB_TIME_D='%dd %H:%M:%S'"
+    "no 24h gauge"      "PB_24H=off"
+    "reordered"         "PB_ORDER='ctx 7d 5h'"
+    "6 cells"           "PB_5H_WIDTH=6 PB_24H_WIDTH=6 PB_7D_WIDTH=6 PB_CTX_WIDTH=6"
+    "bars only"         "PB_5H_PCT=off PB_24H_PCT=off PB_7D_PCT=off PB_CTX_PCT=off"
+    "stricter colours"  "PB_5H_WARN=30 PB_5H_CRIT=60 PB_7D_WARN=30 PB_7D_CRIT=60"
+    "translated"        "PB_5H_LABEL='5ч:' PB_24H_LABEL='сут:' PB_7D_LABEL='нед:' PB_TIME_D='%dд %hч'"
+  )
+  local conf; conf=$(mktemp)
+  local i
+  for (( i = 0; i < ${#pairs[@]}; i += 2 )); do
+    printf '%s\n' "${pairs[$((i+1))]}" > "$conf"
+    printf '  \033[1m%-18s\033[0m' "${pairs[$i]}"
+    feed 63 58 37 3 3 | PB_CONF=$conf COLUMNS=140 ./pacebar.sh
+  done
+  rm -f "$conf"
+}
+
+if [ "${1-}" = --configs ]; then
+  printf '\n'; configs; printf '\n'
+elif [ $# -ge 3 ]; then
   show "5h $1% · week $2% · ctx $3%" "$1" "$2" "$3" 3 5
 else
-  show "fresh start"                        8 16  4  4 6
-  show "an ordinary afternoon"             46 52 33  3 4
-  show "running hot"                       88 84 71  1 2
-  show "yesterday left a surplus"          12 20 25  4 5
+  show "fresh start"                        8  2  4  4 6
+  show "an ordinary afternoon"             46 38 33  3 4
+  show "running hot"                       88 84 71  1 1
+  show "yesterday left a surplus"          12  6 25  4 5
 fi
 echo

@@ -45,7 +45,10 @@ for your own 5h / week / context numbers.
 ## Configuration
 
 Copy [`pacebar.conf.example`](pacebar.conf.example) to `~/.claude/pacebar.conf`
-and uncomment what you want. It is sourced as plain bash.
+and uncomment what you want. It is sourced as plain bash. The same numbers under
+a handful of different settings — `./preview.sh --configs`:
+
+![configuration examples](demo/configs.png)
 
 **Layout**
 
