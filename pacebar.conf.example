@@ -30,6 +30,7 @@
 # PB_5H_CRIT=80       # red from here
 
 # ─── Colours (256-colour palette indices) ────────────────────────────────────
+# NO_COLOR=1 in the environment drops colour altogether.
 # PB_COLOR_OK=22
 # PB_COLOR_WARN=94
 # PB_COLOR_CRIT=88

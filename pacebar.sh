@@ -108,6 +108,20 @@ printf -v C_WARN  '\033[%s;48;5;%sm'  "$PB_COLOR_TEXT"       "$PB_COLOR_WARN"
 printf -v C_CRIT  '\033[%s;48;5;%sm'  "$PB_COLOR_TEXT"       "$PB_COLOR_CRIT"
 printf -v C_EMPTY '\033[%s;48;5;%sm'  "$PB_COLOR_TEXT_EMPTY" "$PB_COLOR_EMPTY"
 
+# A bar cell carries a block glyph painted in its own background colour: a
+# colour terminal renders it as solid fill, one without colour still shows the
+# bar. Only the caption is set apart, so it stays readable either way.
+printf -v B_OK    '\033[38;5;%s;48;5;%sm' "$PB_COLOR_OK"    "$PB_COLOR_OK"
+printf -v B_WARN  '\033[38;5;%s;48;5;%sm' "$PB_COLOR_WARN"  "$PB_COLOR_WARN"
+printf -v B_CRIT  '\033[38;5;%s;48;5;%sm' "$PB_COLOR_CRIT"  "$PB_COLOR_CRIT"
+printf -v B_EMPTY '\033[38;5;%s;48;5;%sm' "$PB_COLOR_EMPTY" "$PB_COLOR_EMPTY"
+
+# NO_COLOR (no-color.org): drop every escape, leaving the bars as block glyphs.
+if [ -n "${NO_COLOR-}" ]; then
+  CR='' C_DIM='' C_OK='' C_WARN='' C_CRIT='' C_EMPTY=''
+  B_OK='' B_WARN='' B_CRIT='' B_EMPTY=''
+fi
+
 # ─── Input ───────────────────────────────────────────────────────────────────
 
 input=$(cat)
@@ -228,15 +242,15 @@ fmt_time() {
 # 100% and into negative numbers, while the fill stays inside the scale.
 gauge() {
   local pct=$1 caption=$2 width=$3 warn=$4 crit=$5
-  local filled fill start len i ch colour out=''
+  local filled fill solid start len i ch colour cell out=''
 
   [ "$pct" -lt 0 ]   && pct=0
   [ "$pct" -gt 100 ] && pct=100
   filled=$(( (pct * width + 50) / 100 ))
 
-  if   [ "$pct" -ge "$crit" ]; then fill=$C_CRIT
-  elif [ "$pct" -ge "$warn" ]; then fill=$C_WARN
-  else                              fill=$C_OK
+  if   [ "$pct" -ge "$crit" ]; then fill=$C_CRIT; solid=$B_CRIT
+  elif [ "$pct" -ge "$warn" ]; then fill=$C_WARN; solid=$B_WARN
+  else                              fill=$C_OK;   solid=$B_OK
   fi
 
   len=${#caption}
@@ -244,13 +258,14 @@ gauge() {
   [ "$start" -lt 0 ] && start=0
 
   for (( i = 0; i < width; i++ )); do
-    [ "$i" -lt "$filled" ] && colour=$fill || colour=$C_EMPTY
-    if [ "$i" -ge "$start" ] && [ "$i" -lt $(( start + len )) ]; then
-      ch=${caption:$(( i - start )):1}
-    else
-      ch=' '
+    if [ "$i" -lt "$filled" ]; then colour=$fill;    cell=$solid;   ch='▓'
+    else                            colour=$C_EMPTY; cell=$B_EMPTY; ch='░'
     fi
-    out+="${colour}${ch}"
+    if [ "$i" -ge "$start" ] && [ "$i" -lt $(( start + len )) ]; then
+      out+="${colour}${caption:$(( i - start )):1}"
+    else
+      out+="${cell}${ch}"
+    fi
   done
   printf '%s%s' "$out" "$CR"
 }

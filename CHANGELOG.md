@@ -9,6 +9,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 - The status-line JSON is parsed in bash instead of jq, and the model section
   is formatted without sed. pacebar now needs nothing but bash 3.2 or newer.
+- Bar cells carry block glyphs painted in their own background colour, so the
+  bars read on terminals without colour and look unchanged on those with it.
+  `NO_COLOR` is honoured.
 
 ## [1.0.0] — 2026-08-20
 

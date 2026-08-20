@@ -60,7 +60,8 @@ PB_M_CTX=off
 
 ## Install
 
-Needs `bash` 3.2 or newer and a 256-colour terminal.
+Needs `bash` 3.2 or newer. Colour needs a 256-colour terminal; the bars read
+without it too. `NO_COLOR` turns colour off.
 
 ```bash
 git clone https://github.com/tavgear/claude-code-pacebar ~/.claude/pacebar

@@ -26,6 +26,8 @@ A new or changed setting lands in three places at once: the Defaults block,
   settings line, and a dependency would undo that.
 - 3.2 being the floor rules out `declare -A`, `${var,,}`, `mapfile`, `local -n`
   and bare `EPOCHSECONDS`.
+- Bar cells carry block glyphs, so the bars read without colour; colour only
+  reinforces them.
 - A missing or unreadable field skips its section rather than failing.
 - The version lives in `PB_VERSION` and `CHANGELOG.md` (Keep a Changelog,
   SemVer).
