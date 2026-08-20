@@ -1,0 +1,59 @@
+# pacebar configuration — copy to ~/.claude/pacebar.conf and edit.
+# Sourced as plain bash; anything you leave out keeps its default.
+
+# ─── Layout ──────────────────────────────────────────────────────────────────
+# PB_WIDE_MIN=125                  # columns; below this the mobile preset applies
+# PB_ORDER="model 5h 24h 7d ctx"   # sections to print, in order
+# PB_SEP=2                         # spaces between sections
+
+# ─── Sections on/off ─────────────────────────────────────────────────────────
+# PB_MODEL=on
+# PB_5H=on
+# PB_24H=on
+# PB_7D=on
+# PB_CTX=on
+
+# ─── Model ───────────────────────────────────────────────────────────────────
+# PB_MODEL_FMT='%n (%e)'   # %n — name, %e — effort level
+# PB_MODEL_SHORT=off       # on → a single letter: O, S, H
+# PB_MODEL_STRIP=on        # drop a trailing parenthetical: "Opus 5 (1M)" → "Opus 5"
+
+# ─── Gauges ──────────────────────────────────────────────────────────────────
+# Replace 5H with 24H, 7D or CTX for the others.
+# PB_5H_LABEL='5h:'   # printed verbatim; empty for no label
+# PB_5H_WIDTH=12      # cells
+# PB_5H_PCT=pct       # pct → "46%", num → "46", off → nothing
+# PB_5H_LEFT=on       # time until the window resets (CTX has none)
+# PB_5H_WARN=50       # amber from here
+# PB_5H_CRIT=80       # red from here
+
+# ─── Colours (256-colour palette indices) ────────────────────────────────────
+# PB_COLOR_OK=22
+# PB_COLOR_WARN=94
+# PB_COLOR_CRIT=88
+# PB_COLOR_EMPTY=236
+# PB_COLOR_TEXT=97
+# PB_COLOR_TEXT_EMPTY=37
+# PB_COLOR_DIM=90
+
+# ─── Time remaining ──────────────────────────────────────────────────────────
+# One template per magnitude, so the leading zero unit drops out by itself.
+# %d days · %h/%H hours in day · %m/%M minutes in hour · %s/%S seconds in
+# minute (capitals zero-pad) · %tH/%tM/%tS totals · %% a literal percent.
+# PB_TIME_PRESET=compact   # compact: 3d4h · 4h5m · 56m      (kubectl, docker)
+#                          # clock:   3-04:56 · 04:56        (ps -o etime, Slurm)
+#                          # long:    3d 4h · 4h 5m · 56m
+# PB_TIME_D=''             # ≥ 1 day  — an explicit template overrides the preset
+# PB_TIME_H=''             # < 1 day
+# PB_TIME_M=''             # < 1 hour
+# PB_TIME_M='%m:%S'        # e.g. seconds in the last hour: "56:07"
+
+# ─── Mobile preset ───────────────────────────────────────────────────────────
+# Any PB_M_<NAME> replaces PB_<NAME> below PB_WIDE_MIN columns. Add your own.
+# PB_M_SEP=1
+# PB_M_MODEL_FMT='%n:'
+# PB_M_MODEL_SHORT=on
+# PB_M_24H=off
+# PB_M_5H_LABEL=''  PB_M_7D_LABEL=''  PB_M_CTX_LABEL=''
+# PB_M_5H_WIDTH=9   PB_M_7D_WIDTH=9   PB_M_CTX_WIDTH=9
+# PB_M_5H_PCT=num   PB_M_7D_PCT=num   PB_M_CTX_PCT=num
